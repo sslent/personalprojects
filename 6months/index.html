@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Claris & Sophia — 6 Months ♥</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+            rel="stylesheet" />
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+                image-rendering: pixelated;
+            }
+
+            body {
+                background: #1a0a14;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                overflow-x: hidden;
+            }
+
+            .stars {
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            .star {
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background: #ffd6e0;
+                animation: twinkle 2s infinite;
+            }
+
+            @keyframes twinkle {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.2;
+                }
+            }
+
+            .pixel-border {
+                border: 4px solid #ff6b8a;
+                box-shadow:
+                    0 0 0 4px #1a0a14,
+                    0 0 0 8px #ff6b8a,
+                    0 0 0 12px #1a0a14;
+                background: #2d0f22;
+                padding: 24px 28px;
+                text-align: center;
+                max-width: 560px;
+                width: 100%;
+                position: relative;
+                z-index: 1;
+            }
+
+            .heart-corner {
+                position: absolute;
+                font-size: 14px;
+                color: #ff6b8a;
+                animation: heartbeat 1.4s infinite;
+            }
+            .heart-corner.tl {
+                top: -10px;
+                left: -10px;
+            }
+            .heart-corner.tr {
+                top: -10px;
+                right: -10px;
+            }
+            .heart-corner.bl {
+                bottom: -10px;
+                left: -10px;
+            }
+            .heart-corner.br {
+                bottom: -10px;
+                right: -10px;
+            }
+
+            @keyframes heartbeat {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.25);
+                }
+            }
+
+            .title-badge {
+                background: #ff2d55;
+                color: #fff0f5;
+                font-family: "Press Start 2P", monospace;
+                font-size: 7px;
+                padding: 6px 12px;
+                display: inline-block;
+                margin-bottom: 18px;
+                letter-spacing: 1px;
+                box-shadow: 4px 4px 0 #8b0024;
+            }
+
+            .main-title {
+                font-family: "Press Start 2P", monospace;
+                font-size: 14px;
+                color: #ffd6e0;
+                line-height: 1.8;
+                margin-bottom: 6px;
+                text-shadow: 3px 3px 0 #8b0024;
+            }
+
+            .sub-title {
+                font-family: "Press Start 2P", monospace;
+                font-size: 9px;
+                color: #ff8fab;
+                margin-bottom: 24px;
+                letter-spacing: 1px;
+            }
+
+            .pixel-hearts-row {
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+                margin-bottom: 24px;
+            }
+
+            .ph {
+                width: 16px;
+                height: 16px;
+                background: #ff2d55;
+                position: relative;
+                display: inline-block;
+                transform: rotate(45deg);
+                animation: heartbeat 1.4s infinite;
+            }
+            .ph::before,
+            .ph::after {
+                content: "";
+                width: 16px;
+                height: 16px;
+                background: #ff2d55;
+                border-radius: 50% 50% 0 0;
+                position: absolute;
+            }
+            .ph::before {
+                left: -8px;
+                top: 0;
+            }
+            .ph::after {
+                top: -8px;
+                left: 0;
+            }
+            .ph:nth-child(2) {
+                background: #ff8fab;
+                animation-delay: 0.2s;
+            }
+            .ph:nth-child(2)::before,
+            .ph:nth-child(2)::after {
+                background: #ff8fab;
+            }
+            .ph:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+            .ph:nth-child(4) {
+                background: #ff8fab;
+                animation-delay: 0.6s;
+            }
+            .ph:nth-child(4)::before,
+            .ph:nth-child(4)::after {
+                background: #ff8fab;
+            }
+            .ph:nth-child(5) {
+                animation-delay: 0.8s;
+            }
+
+            .letter-btn {
+                cursor: pointer;
+                background: transparent;
+                border: none;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                animation: float 3s ease-in-out infinite;
+                outline: none;
+                margin: 0 auto 20px;
+            }
+
+            .letter-btn:hover {
+                transform: scale(1.08);
+            }
+            .letter-btn:active {
+                transform: scale(0.95);
+            }
+
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0px);
+                }
+                50% {
+                    transform: translateY(-8px);
+                }
+            }
+
+            .envelope {
+                width: 80px;
+                height: 56px;
+                background: #ff8fab;
+                border: 4px solid #ff2d55;
+                box-shadow: 4px 4px 0 #8b0024;
+                position: relative;
+                display: block;
+            }
+
+            .env-flap {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 32px;
+                background: #ffd6e0;
+                clip-path: polygon(0 0, 50% 65%, 100% 0);
+                border-bottom: 4px solid #ff2d55;
+            }
+
+            .env-seal {
+                position: absolute;
+                bottom: 8px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 22px;
+                height: 22px;
+                background: #ff2d55;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 11px;
+                color: #fff0f5;
+                border: 3px solid #8b0024;
+                z-index: 2;
+                font-family: serif;
+            }
+
+            .letter-btn-label {
+                font-family: "Press Start 2P", monospace;
+                font-size: 7px;
+                color: #ffd6e0;
+                text-align: center;
+                line-height: 1.6;
+                letter-spacing: 0.5px;
+                animation: blink 1.2s step-end infinite;
+            }
+
+            @keyframes blink {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0;
+                }
+            }
+
+            .counter-row {
+                display: flex;
+                justify-content: center;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+
+            .counter-box {
+                background: #3d1030;
+                border: 3px solid #ff6b8a;
+                box-shadow: 3px 3px 0 #8b0024;
+                padding: 8px 10px;
+                text-align: center;
+                min-width: 68px;
+            }
+
+            .counter-num {
+                font-family: "Press Start 2P", monospace;
+                font-size: 15px;
+                color: #ff2d55;
+                display: block;
+                text-shadow: 2px 2px 0 #8b0024;
+            }
+
+            .counter-lbl {
+                font-family: "Press Start 2P", monospace;
+                font-size: 5px;
+                color: #ff8fab;
+                display: block;
+                margin-top: 4px;
+                letter-spacing: 0.5px;
+            }
+
+            /* MODAL */
+            .modal-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(26, 10, 20, 0.92);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 100;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s;
+                padding: 16px;
+            }
+
+            .modal-overlay.open {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .letter-card {
+                background: #fff8f0;
+                border: 6px solid #ff2d55;
+                box-shadow: 8px 8px 0 #8b0024;
+                max-width: 480px;
+                width: 100%;
+                padding: 28px 24px;
+                position: relative;
+                transform: scale(0.85);
+                transition: transform 0.2s;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .modal-overlay.open .letter-card {
+                transform: scale(1);
+            }
+
+            .letter-close {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                background: #ff2d55;
+                border: 3px solid #8b0024;
+                color: #fff;
+                font-family: "Press Start 2P", monospace;
+                font-size: 8px;
+                padding: 5px 8px;
+                cursor: pointer;
+                box-shadow: 2px 2px 0 #8b0024;
+            }
+            .letter-close:hover {
+                background: #8b0024;
+            }
+
+            .letter-header {
+                font-family: "Press Start 2P", monospace;
+                font-size: 8px;
+                color: #ff2d55;
+                margin-bottom: 16px;
+                text-align: center;
+                text-shadow: 1px 1px 0 #ffb3c6;
+            }
+
+            .letter-divider {
+                height: 4px;
+                background: repeating-linear-gradient(90deg, #ff2d55 0 8px, transparent 8px 16px);
+                margin: 10px 0 18px;
+            }
+
+            .letter-body {
+                font-family: "VT323", monospace;
+                font-size: 22px;
+                color: #3d1030;
+                line-height: 1.75;
+            }
+
+            .letter-body p {
+                margin-bottom: 14px;
+            }
+
+            .letter-sig {
+                font-family: "Press Start 2P", monospace;
+                font-size: 7px;
+                color: #ff2d55;
+                margin-top: 20px;
+                text-align: right;
+                line-height: 2;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="stars" id="stars"></div>
+
+        <div class="pixel-border">
+            <span class="heart-corner tl">♥</span>
+            <span class="heart-corner tr">♥</span>
+            <span class="heart-corner bl">♥</span>
+            <span class="heart-corner br">♥</span>
+
+            <div class="title-badge">✦ A love story between Player 1 and Player 2 ✦</div>
+
+            <div class="main-title">CLARIS &amp;</div>
+            <div class="main-title">SOPHIA</div>
+            <div class="sub-title">☆ 6 months together ☆</div>
+
+            <div class="pixel-hearts-row">
+                <div class="ph"></div>
+                <div class="ph"></div>
+                <div class="ph"></div>
+                <div class="ph"></div>
+                <div class="ph"></div>
+            </div>
+
+            <button class="letter-btn" onclick="openLetter()">
+                <div class="envelope">
+                    <div class="env-flap"></div>
+                    <div class="env-seal">♥</div>
+                </div>
+                <span class="letter-btn-label">▶ CLICK TO OPEN LETTER ◀</span>
+            </button>
+
+            <div class="counter-row" id="counters"></div>
+        </div>
+
+        <div class="modal-overlay" id="modal">
+            <div class="letter-card">
+                <button class="letter-close" onclick="closeLetter()">✕ CLOSE</button>
+                <div class="letter-header">♥ A LETTER FOR YOU ♥</div>
+                <div class="letter-divider"></div>
+                <div class="letter-body">
+                    <p>Dear Claris,</p>
+                    <p>
+                        Six months ago, something beautiful happened between us. I couldn't be happier that it was you
+                        who I decided to enter this partnership with.
+                    </p>
+                    <p>
+                        You've made the most boring of days feel like little adventures. Your laugh (your real one, not
+                        the fake one) is my favourite sound, and somehow you always know exactly how to make me smile
+                        even when I've decided to be a cranky lil gremlin.
+                    </p>
+                    <p>
+                        Every anniversary feels like unlocking a new level (get it wink wink). Baby you make my world so
+                        much brighter just by being in it.
+                    </p>
+                    <p>Thank you for being my player two, my safe place, my partner and my very favourite person.</p>
+                    <p>Here's to six months... and many more to come.</p>
+                </div>
+                <div class="letter-sig" style= font-size: 9px>
+                    with all my love,<br />
+                    your bug ♥
+                    
+                </div>
+                
+                  <a href="month2.html" style="font-family: 'Press Start 2P', monospace; font-size: 10px;color:#8b0024">continue</a>
+                    
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Starfield
+            const starContainer = document.getElementById("stars");
+            for (let i = 0; i < 60; i++) {
+                const s = document.createElement("div");
+                s.className = "star";
+                s.style.left = Math.random() * 100 + "%";
+                s.style.top = Math.random() * 100 + "%";
+                s.style.animationDelay = Math.random() * 2 + "s";
+                s.style.animationDuration = 1.5 + Math.random() * 2 + "s";
+                s.style.opacity = 0.3 + Math.random() * 0.7;
+                starContainer.appendChild(s);
+            }
+
+            // Counter — update the start date below to your real anniversary date!
+            const start = new Date("2024-10-10"); // ← CHANGE THIS DATE
+            const now = new Date();
+            const diff = now - start;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            const data = [
+                { n: 6, l: "MONTHS" },
+                { n: days, l: "DAYS" },
+                { n: hours, l: "HOURS" },
+                { n: mins, l: "MINUTES" }
+            ];
+
+            const row = document.getElementById("counters");
+            data.forEach((d) => {
+                const box = document.createElement("div");
+                box.className = "counter-box";
+                box.innerHTML =
+                    '<span class="counter-num">' + d.n + '</span><span class="counter-lbl">' + d.l + "</span>";
+                row.appendChild(box);
+            });
+
+            function openLetter() {
+                document.getElementById("modal").classList.add("open");
+            }
+            function closeLetter() {
+                document.getElementById("modal").classList.remove("open");
+            }
+        </script>
+    </body>
+</html>

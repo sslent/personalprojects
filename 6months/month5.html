@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Our Places — The Map ♥</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+            rel="stylesheet" />
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+                image-rendering: pixelated;
+            }
+
+            body {
+                background: #1a0a14;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                padding: 24px 16px 48px;
+                font-family: "Press Start 2P", monospace;
+                overflow-x: hidden;
+            }
+
+            .stars {
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 0;
+            }
+            .star {
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background: #ffd6e0;
+                animation: twinkle 2s infinite;
+            }
+            @keyframes twinkle {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.2;
+                }
+            }
+
+            .page {
+                position: relative;
+                z-index: 1;
+                width: 100%;
+                max-width: 700px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .title-badge {
+                background: #ff2d55;
+                color: #fff0f5;
+                font-size: 7px;
+                padding: 6px 14px;
+                display: inline-block;
+                box-shadow: 4px 4px 0 #8b0024;
+                letter-spacing: 1px;
+                margin-top: 8px;
+            }
+            .main-title {
+                font-size: 12px;
+                color: #ffd6e0;
+                text-shadow: 3px 3px 0 #8b0024;
+                line-height: 1.9;
+                text-align: center;
+            }
+
+            .pixel-border {
+                border: 4px solid #ff6b8a;
+                box-shadow:
+                    0 0 0 4px #1a0a14,
+                    0 0 0 8px #ff6b8a,
+                    0 0 0 12px #1a0a14;
+                background: #2d0f22;
+                padding: 22px 20px;
+                width: 100%;
+                position: relative;
+            }
+            .heart-corner {
+                position: absolute;
+                font-size: 14px;
+                color: #ff6b8a;
+                animation: hb 1.4s infinite;
+            }
+            .heart-corner.tl {
+                top: -10px;
+                left: -10px;
+            }
+            .heart-corner.tr {
+                top: -10px;
+                right: -10px;
+            }
+            .heart-corner.bl {
+                bottom: -10px;
+                left: -10px;
+            }
+            .heart-corner.br {
+                bottom: -10px;
+                right: -10px;
+            }
+            @keyframes hb {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.3);
+                }
+            }
+
+            .divider {
+                height: 4px;
+                background: repeating-linear-gradient(90deg, #ff2d55 0 8px, transparent 8px 16px);
+                margin: 12px 0;
+            }
+
+            .city-tabs {
+                display: flex;
+                gap: 0;
+                width: 100%;
+                margin-bottom: 0;
+            }
+            .tab-btn {
+                flex: 1;
+                background: #3d1030;
+                border: 3px solid #ff6b8a;
+                color: #ff8fab;
+                font-family: "Press Start 2P", monospace;
+                font-size: 7px;
+                padding: 10px 6px;
+                cursor: pointer;
+                box-shadow: 3px 3px 0 #8b0024;
+                transition:
+                    transform 0.1s,
+                    box-shadow 0.1s;
+                letter-spacing: 0.5px;
+                position: relative;
+                z-index: 1;
+            }
+            .tab-btn:first-child {
+                border-right: 2px solid #ff6b8a;
+            }
+            .tab-btn.active {
+                background: #ff2d55;
+                color: #fff0f5;
+                box-shadow: 3px 3px 0 #8b0024;
+                z-index: 2;
+            }
+            .tab-btn:hover:not(.active) {
+                background: #4d1840;
+                transform: translate(-1px, -1px);
+            }
+
+            .map-section {
+                display: none;
+                width: 100%;
+            }
+            .map-section.active {
+                display: block;
+            }
+
+            .map-wrap {
+                position: relative;
+                width: 100%;
+                border: 4px solid #ff6b8a;
+                box-shadow:
+                    0 0 0 4px #1a0a14,
+                    0 0 0 8px #ff2d55;
+                overflow: hidden;
+                background: #1a0a14;
+            }
+
+            .map-wrap img.map-bg {
+                width: 100%;
+                height: 100%;
+                display: block;
+                object-fit: cover;
+                opacity: 0.85;
+                min-height: 340px;
+                background: #2d0f22;
+            }
+
+            .map-wrap svg.map-svg {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                overflow: visible;
+            }
+
+            .pin-group {
+                cursor: pointer;
+            }
+            .pin-group:hover .pin-pulse {
+                animation: pulse 0.8s infinite;
+            }
+
+            .pin-dot {
+                fill: #ff2d55;
+                stroke: #fff0f5;
+                stroke-width: 0.8;
+                filter: drop-shadow(1px 1px 0 #8b0024);
+                transition: r 0.15s;
+            }
+            .pin-group:hover .pin-dot {
+                r: 4;
+            }
+
+            .pin-label-text {
+                font-family: "Press Start 2P", monospace;
+                font-size: 3px;
+                fill: #ffd6e0;
+                pointer-events: none;
+            }
+
+            @keyframes pulse {
+                0% {
+                    r: 5;
+                    opacity: 0.6;
+                }
+                100% {
+                    r: 9;
+                    opacity: 0;
+                }
+            }
+            .pin-pulse {
+                fill: #ff2d55;
+                opacity: 0;
+            }
+
+            .loc-panel {
+                background: #3d1030;
+                border: 3px solid #ff6b8a;
+                box-shadow: 3px 3px 0 #8b0024;
+                padding: 0;
+                margin-top: 12px;
+                overflow: hidden;
+                transition: max-height 0.4s ease;
+                max-height: 0;
+            }
+            .loc-panel.open {
+                max-height: 700px;
+            }
+            .loc-inner {
+                padding: 16px 16px 18px;
+            }
+
+            .loc-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 10px;
+                margin-bottom: 12px;
+            }
+            .loc-name {
+                font-size: 9px;
+                color: #ff2d55;
+                text-shadow: 2px 2px 0 #8b0024;
+                line-height: 1.8;
+                flex: 1;
+            }
+            .loc-close {
+                background: #ff2d55;
+                border: none;
+                color: #fff0f5;
+                font-family: "Press Start 2P", monospace;
+                font-size: 7px;
+                width: 26px;
+                height: 26px;
+                cursor: pointer;
+                box-shadow: 2px 2px 0 #8b0024;
+                flex-shrink: 0;
+                transition: transform 0.1s;
+            }
+            .loc-close:hover {
+                transform: scale(1.1);
+            }
+
+            .loc-city-tag {
+                font-size: 5px;
+                padding: 3px 8px;
+                display: inline-block;
+                box-shadow: 2px 2px 0 #8b0024;
+                margin-bottom: 10px;
+                background: #6b0f3a;
+                color: #ff8fab;
+                border: 2px solid #ff6b8a;
+            }
+
+            .loc-photo {
+                width: 100%;
+                height: auto;
+                display: block;
+                object-fit: cover;
+                border: 3px solid #ff6b8a;
+                box-shadow: 3px 3px 0 #8b0024;
+                margin-bottom: 12px;
+                background: #1a0a14;
+            }
+
+            .photo-placeholder {
+                width: 100%;
+                aspect-ratio: 16/9;
+                background: #1a0a14;
+                border: 3px dashed #ff6b8a;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+            .photo-placeholder .ph-icon {
+                font-size: 24px;
+                color: #ff6b8a;
+                opacity: 0.5;
+            }
+            .photo-placeholder .ph-text {
+                font-size: 5px;
+                color: #ff8fab;
+                opacity: 0.6;
+                text-align: center;
+                line-height: 2;
+            }
+
+            .loc-desc {
+                font-family: "VT323", monospace;
+                font-size: 20px;
+                color: #ffd6e0;
+                line-height: 1.6;
+                margin-bottom: 10px;
+            }
+            .loc-memory {
+                font-family: "VT323", monospace;
+                font-size: 18px;
+                color: #ff8fab;
+                line-height: 1.6;
+                border-left: 3px solid #ff2d55;
+                padding-left: 10px;
+            }
+
+            .legend {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 14px;
+            }
+            .legend-item {
+                background: #3d1030;
+                border: 2px solid #ff6b8a;
+                box-shadow: 2px 2px 0 #8b0024;
+                padding: 5px 8px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                cursor: pointer;
+                transition:
+                    transform 0.1s,
+                    background 0.1s;
+            }
+            .legend-item:hover {
+                transform: translate(-1px, -1px);
+                background: #4d1840;
+            }
+            .legend-item.active-pin {
+                background: #ff2d55;
+            }
+            .legend-dot {
+                width: 8px;
+                height: 8px;
+                background: #ff2d55;
+                border: 2px solid #fff0f5;
+                flex-shrink: 0;
+            }
+            .legend-name {
+                font-size: 5px;
+                color: #ffd6e0;
+            }
+
+            .bottom-note {
+                font-family: "VT323", monospace;
+                font-size: 22px;
+                color: #ff8fab;
+                text-align: center;
+                line-height: 1.7;
+            }
+
+            .pixel-hearts-row {
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+                margin: 6px 0;
+            }
+            .ph-heart {
+                width: 14px;
+                height: 14px;
+                background: #ff2d55;
+                position: relative;
+                display: inline-block;
+                transform: rotate(45deg);
+                animation: hb 1.4s infinite;
+            }
+            .ph-heart::before,
+            .ph-heart::after {
+                content: "";
+                width: 14px;
+                height: 14px;
+                background: #ff2d55;
+                border-radius: 50% 50% 0 0;
+                position: absolute;
+            }
+            .ph-heart::before {
+                left: -7px;
+                top: 0;
+            }
+            .ph-heart::after {
+                top: -7px;
+                left: 0;
+            }
+            .ph-heart:nth-child(even) {
+                background: #ff8fab;
+            }
+            .ph-heart:nth-child(even)::before,
+            .ph-heart:nth-child(even)::after {
+                background: #ff8fab;
+            }
+
+            .continue-btn {
+                display: inline-block;
+                margin-top: 8px;
+                background: #ff2d55;
+                border: none;
+                color: #fff0f5;
+                font-family: "Press Start 2P", monospace;
+                font-size: 8px;
+                padding: 12px 20px;
+                cursor: pointer;
+                box-shadow: 4px 4px 0 #8b0024;
+                text-decoration: none;
+                transition: transform 0.1s;
+            }
+            .continue-btn:hover {
+                transform: translate(-2px, -2px);
+                box-shadow: 6px 6px 0 #8b0024;
+            }
+
+            @media (max-width: 480px) {
+                .main-title {
+                    font-size: 9px;
+                }
+                .pin-label-text {
+                    font-size: 2.5px;
+                }
+                .loc-name {
+                    font-size: 7px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="stars" id="stars"></div>
+
+        <div class="page">
+            <div class="title-badge">&#10022; OUR PLACES &#10022;</div>
+            <div class="main-title">EVERYWHERE<br />WE'VE BEEN &#9829;</div>
+
+            <div class="pixel-border">
+                <span class="heart-corner tl">&#9829;</span>
+                <span class="heart-corner tr">&#9829;</span>
+                <span class="heart-corner bl">&#9829;</span>
+                <span class="heart-corner br">&#9829;</span>
+                <div
+                    style="
+                        font-family: &quot;VT323&quot;, monospace;
+                        font-size: 22px;
+                        color: #ffd6e0;
+                        line-height: 1.7;
+                        text-align: center;
+                    ">
+                    Two lesbians. Two cities.<br />
+                    Click a pin on the map to open a memory. &#9829;
+                </div>
+            </div>
+
+            <div class="pixel-border" style="padding: 18px 16px">
+                <span class="heart-corner tl">&#9829;</span>
+                <span class="heart-corner tr">&#9829;</span>
+                <span class="heart-corner bl">&#9829;</span>
+                <span class="heart-corner br">&#9829;</span>
+
+                <div class="city-tabs">
+                    <button class="tab-btn active" onclick="switchCity('la')">&#9830; LOS ANGELES</button>
+                    <button class="tab-btn" onclick="switchCity('ny')">&#9830; NEW YORK</button>
+                </div>
+
+                <!-- ══ LOS ANGELES ══ -->
+                <div class="map-section active" id="section-la">
+                    <!-- SVG is INSIDE map-wrap, right after the img — this is the fix -->
+                    <div class="map-wrap" style="aspect-ratio: 4/3">
+                        <img class="map-bg" src="../assets/la-map.png" alt="Map of Los Angeles" />
+                        <svg class="map-svg" viewBox="0 0 100 75" preserveAspectRatio="none">
+                            <!-- Little Tokyo -->
+                            <g class="pin-group" onclick="openPin('little-tokyo')" id="pin-little-tokyo">
+                                <circle class="pin-pulse" cx="58" cy="44" r="3" />
+                                <circle class="pin-dot" cx="58" cy="44" r="3" />
+                                <text class="pin-label-text" x="58" y="40" text-anchor="middle">LITTLE TOKYO</text>
+                            </g>
+
+                            <!-- Griffith Observatory -->
+                            <g class="pin-group" onclick="openPin('griffith')" id="pin-griffith">
+                                <circle class="pin-pulse" cx="52" cy="28" r="3" />
+                                <circle class="pin-dot" cx="52" cy="28" r="3" />
+                                <text class="pin-label-text" x="52" y="24" text-anchor="middle">GRIFFITH OBS.</text>
+                            </g>
+
+                            <!-- The Broad -->
+                            <g class="pin-group" onclick="openPin('broad')" id="pin-broad">
+                                <circle class="pin-pulse" cx="55" cy="47" r="3" />
+                                <circle class="pin-dot" cx="55" cy="47" r="3" />
+                                <text class="pin-label-text" x="55" y="52" text-anchor="middle">THE BROAD</text>
+                            </g>
+
+                            <!-- Malibu -->
+                            <g class="pin-group" onclick="openPin('malibu')" id="pin-malibu">
+                                <circle class="pin-pulse" cx="14" cy="35" r="3" />
+                                <circle class="pin-dot" cx="14" cy="35" r="3" />
+                                <text class="pin-label-text" x="14" y="31" text-anchor="middle">MALIBU</text>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="legend" id="legend-la">
+                        <div class="legend-item" onclick="openPin('little-tokyo')" data-pin="little-tokyo">
+                            <div class="legend-dot"></div>
+                            <span class="legend-name">LITTLE TOKYO</span>
+                        </div>
+                        <div class="legend-item" onclick="openPin('griffith')" data-pin="griffith">
+                            <div class="legend-dot"></div>
+                            <span class="legend-name">GRIFFITH OBSERVATORY</span>
+                        </div>
+                        <div class="legend-item" onclick="openPin('broad')" data-pin="broad">
+                            <div class="legend-dot"></div>
+                            <span class="legend-name">THE BROAD</span>
+                        </div>
+                        <div class="legend-item" onclick="openPin('malibu')" data-pin="malibu">
+                            <div class="legend-dot"></div>
+                            <span class="legend-name">MALIBU</span>
+                        </div>
+                    </div>
+
+                    <div class="loc-panel" id="panel-la">
+                        <div class="loc-inner" id="panel-la-inner"></div>
+                    </div>
+                </div>
+
+                <!-- ══ NEW YORK ══ -->
+                <div class="map-section" id="section-ny">
+                    <div class="map-wrap" style="aspect-ratio: 4/3">
+                        <img class="map-bg" src="../assets/ny-map.png" alt="Map of New York" />
+                        <svg class="map-svg" viewBox="0 0 100 75" preserveAspectRatio="none">
+                            <!-- NY Ballet -->
+                            <g class="pin-group" onclick="openPin('nyballet')" id="pin-nyballet">
+                                <circle class="pin-pulse" cx="38" cy="28" r="3" />
+                                <circle class="pin-dot" cx="38" cy="28" r="3" />
+                                <text class="pin-label-text" x="38" y="24" text-anchor="middle">NY BALLET</text>
+                            </g>
+
+                            <!-- The Met -->
+                            <g class="pin-group" onclick="openPin('met')" id="pin-met">
+                                <circle class="pin-pulse" cx="56" cy="25" r="3" />
+                                <circle class="pin-dot" cx="56" cy="25" r="3" />
+                                <text class="pin-label-text" x="56" y="21" text-anchor="middle">THE MET</text>
+                            </g>
+
+                            <!-- Central Park -->
+                            <g class="pin-group" onclick="openPin('centralpark')" id="pin-centralpark">
+                                <circle class="pin-pulse" cx="46" cy="22" r="3" />
+                                <circle class="pin-dot" cx="46" cy="22" r="3" />
+                                <text class="pin-label-text" x="46" y="18" text-anchor="middle">CENTRAL PARK</text>
+                            </g>
+
+                            <!-- SoHo -->
+                            <g class="pin-group" onclick="openPin('soho')" id="pin-soho">
+                                <circle class="pin-pulse" cx="46" cy="60" r="3" />
+                                <circle class="pin-dot" cx="46" cy="60" r="3" />
+                                <text class="pin-label-text" x="46" y="56" text-anchor="middle">SOHO</text>
+                            </g>
+
+                            <!-- NY Public Library -->
+                            <g class="pin-group" onclick="openPin('nypl')" id="pin-nypl">
+                                <circle class="pin-pulse" cx="50" cy="43" r="3" />
+                                <circle class="pin-dot" cx="50" cy="43" r="3" />
+                                <text class="pin-label-text" x="50" y="39" text-anchor="middle">NYPL</text>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="legend" id="legend-ny">
+                        <div class="legend-item" onclick="openPin('nyballet')" data-pin="nyballet">
+                            <div class="legend-dot"></div>
+                            <span class="legend-name">NY BALLET</span>
+                        </div>
+                        <div class="legend-item" onclick="openPin('met')" data-pin="met">
+                            <div class="legend-dot"></div>
+                            <span class="legend-name">THE MET</span>
+                        </div>
+                        <div class="legend-item" onclick="openPin('centralpark')" data-pin="centralpark">
+                            <div class="legend-dot"></div>
+                            <span class="legend-name">CENTRAL PARK</span>
+                        </div>
+                        <div class="legend-item" onclick="openPin('soho')" data-pin="soho">
+                            <div class="legend-dot"></div>
+                            <span class="legend-name">SOHO</span>
+                        </div>
+                        <div class="legend-item" onclick="openPin('nypl')" data-pin="nypl">
+                            <div class="legend-dot"></div>
+                            <span class="legend-name">NY PUBLIC LIBRARY</span>
+                        </div>
+                    </div>
+
+                    <div class="loc-panel" id="panel-ny">
+                        <div class="loc-inner" id="panel-ny-inner"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pixel-border">
+                <span class="heart-corner tl">&#9829;</span>
+                <span class="heart-corner tr">&#9829;</span>
+                <span class="heart-corner bl">&#9829;</span>
+                <span class="heart-corner br">&#9829;</span>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+                    <div class="divider" style="width: 100%"></div>
+                    <div class="bottom-note">
+                        Each these places is colored with the memory of you.<br />
+                       I will always remember the places we've been together and how I felt. I am so grateful for all the adventures we've had together.<br />
+                        Here's to every new place we haven't been. &#9829;
+                    </div>
+                    <div class="pixel-hearts-row">
+                        <div class="ph-heart"></div>
+                        <div class="ph-heart"></div>
+                        <div class="ph-heart"></div>
+                        <div class="ph-heart"></div>
+                        <div class="ph-heart"></div>
+                    </div>
+                    <div class="divider" style="width: 100%"></div>
+                    <a href="month6.html" class="continue-btn">&#9658; CONTINUE</a>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var locations = {
+                "little-tokyo": {
+                    city: "LOS ANGELES",
+                    name: "LITTLE TOKYO",
+                    photoHTML:
+                        '<img src="../assets/littletokyo.png" alt="Little Tokyo, Los Angeles" width="500" height="300" class="loc-photo"/>',
+                    desc: "One of our very favorite places in LA to wander and the first place I ever took you.",
+            
+                    panel: "la"
+                },
+
+                griffith: {
+                    city: "LOS ANGELES",
+                    name: "GRIFFITH OBSERVATORY",
+                    photoHTML:
+                        '<img src="../assets/observatory.png" alt="Griffith Observatory, Los Angeles" width="500" height="300" class="loc-photo"/>',
+                    desc: "I was soooooo nervous that you'd hate the observatory. It was so crowded, we were both overstimulated and car sick. But then we found our own little spot and wow what a view. I mean the skyline was nice too I guess.",
+                
+                    panel: "la"
+                },
+
+                broad: {
+                    city: "LOS ANGELES",
+                    name: "THE BROAD",
+                    photoHTML:
+                        '<img src="../assets/broad.png" alt="The Broad Museum, Los Angeles" width="500" height="300" class="loc-photo"/>',
+                    desc: "I love this museum, I've been coming since I was a kid. I was very happy to wander around with you and make up really silly stories about the art together.",
+                
+                    panel: "la"
+                },
+
+                malibu: {
+                    city: "LOS ANGELES",
+                    name: "MALIBU",
+                    photoHTML:
+                        '<img src="../assets/malibu.png" alt="Malibu, California" width="500" height="300" class="loc-photo"/>',
+                    desc: "DA BEAACHHHHH. You know how much I love the beach. It meant a lot to me to be able to share it with you...even though your new york side really comes out. I had a good time watching you guys stress about the sand.",
+                    
+                    panel: "la"
+                },
+
+                nyballet: {
+                    city: "NEW YORK",
+                    name: "NEW YORK BALLET",
+                    photoHTML:
+                        '<img src="../assets/ballerina.png" alt="New York City Ballet, Lincoln Center" width="500" height="300" class="loc-photo"/>',
+                    desc: "Baby. I still dont think you understand how much this meant to me. I have seriously been dreaming about the NY ballet since I was a little girl. I felt like a little girl that night, watching all the ballerinas. Still the experience of a life time, thank you so much.",
+             
+                    panel: "ny"
+                },
+
+                met: {
+                    city: "NEW YORK",
+                    name: "THE MET",
+                    photoHTML:
+                        '<img src="../assets/met.png" alt="The Metropolitan Museum of Art, New York" width="500" height="300" class="loc-photo"/>',
+                    desc: "We met in da MET. I immediately fell in love with this place. I think it will always hold a very special place in our lore.",
+                 
+                    panel: "ny"
+                },
+
+                centralpark: {
+                    city: "NEW YORK",
+                    name: "CENTRAL PARK",
+                    photoHTML:
+                        '<img src="../assets/centralpark.png" alt="Central Park, New York City" width="500" height="300" class="loc-photo"/>',
+                    desc: "Yes, its true. We spent almost 4 hours here on our first date, I checked. The park has to be my favorite part of your city. The first time I visited in August, I went to the park 3 or 4 times. I felt that there was something magic in the air that summer in your park. And laying with you in the grass was honestly the most at peace I'd felt in a long time. I can't wait to be back in May.",
+            
+                    panel: "ny"
+                },
+
+                soho: {
+                    city: "NEW YORK",
+                    name: "SOHO",
+                    photoHTML:
+                        '<img src="../assets/soho.png" alt="SoHo, New York City" width="500" height="300" class="loc-photo"/>',
+                    desc: "So....hoe? I love da soho shopping and all the cool new york girlies running around. I really like this picture of us and the lanterns made me feel like i was in my own little movie.",
+                   
+                    panel: "ny"
+                },
+
+                nypl: {
+                    city: "NEW YORK",
+                    name: "NY PUBLIC LIBRARY",
+                    photoHTML:
+                        '<img src="../assets/library.png" alt="New York Public Library" width="500" height="300" class="loc-photo"/>',
+                    desc: "I can't remember if I broke down crying before or after the library. Before I think? I was just sad to be leaving you and your city. Have I told you I really like your city? Also, this is where you ate a tulip.",
+                
+                    panel: "ny"
+                }
+            };
+
+            var activePin = null;
+            var activeCity = "la";
+
+            function switchCity(city) {
+                activeCity = city;
+                document.getElementById("section-la").classList.toggle("active", city === "la");
+                document.getElementById("section-ny").classList.toggle("active", city === "ny");
+                var tabs = document.querySelectorAll(".tab-btn");
+                tabs[0].classList.toggle("active", city === "la");
+                tabs[1].classList.toggle("active", city === "ny");
+                closePanels();
+                activePin = null;
+            }
+
+            function closePanels() {
+                document.getElementById("panel-la").classList.remove("open");
+                document.getElementById("panel-ny").classList.remove("open");
+                document.querySelectorAll(".legend-item").forEach(function (el) {
+                    el.classList.remove("active-pin");
+                });
+            }
+
+            function openPin(id) {
+                var loc = locations[id];
+                if (!loc) return;
+
+                var panelId = "panel-" + loc.panel;
+                var innerId = "panel-" + loc.panel + "-inner";
+                var panel = document.getElementById(panelId);
+                var inner = document.getElementById(innerId);
+
+                if (activePin === id) {
+                    closePanels();
+                    activePin = null;
+                    return;
+                }
+
+                activePin = id;
+                closePanels();
+
+                inner.innerHTML =
+                    '<div class="loc-header">' +
+                    '<div class="loc-name">' +
+                    loc.name +
+                    "</div>" +
+                    '<button class="loc-close" onclick="closePanels();activePin=null;">&#10005;</button>' +
+                    "</div>" +
+                    '<div class="loc-city-tag">&#9830; ' +
+                    loc.city +
+                    "</div>" +
+                    loc.photoHTML +
+                    '<div class="loc-desc">' +
+                    loc.desc +
+                    "</div>" +
+                    '<div class="divider" style="width:100%;margin:10px 0;"></div>' +
+                    '<div class="loc-memory">' +
+                    loc.memory +
+                    "</div>";
+
+                panel.classList.add("open");
+
+                document.querySelectorAll(".legend-item").forEach(function (el) {
+                    if (el.dataset.pin === id) el.classList.add("active-pin");
+                });
+
+                setTimeout(function () {
+                    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                }, 200);
+            }
+
+            var sc = document.getElementById("stars");
+            for (var i = 0; i < 50; i++) {
+                var s = document.createElement("div");
+                s.className = "star";
+                s.style.left = Math.random() * 100 + "%";
+                s.style.top = Math.random() * 100 + "%";
+                s.style.animationDelay = Math.random() * 2 + "s";
+                s.style.animationDuration = 1.5 + Math.random() * 2 + "s";
+                sc.appendChild(s);
+            }
+        </script>
+    </body>
+</html>

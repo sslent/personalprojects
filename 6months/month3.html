@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Month 3 — How Well Do You Know Us? ♥</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;image-rendering:pixelated;}
+
+    body{
+      background:#1a0a14;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      padding:24px 16px 48px;
+      font-family:'Press Start 2P',monospace;
+      overflow-x:hidden;
+    }
+
+    .stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+    .star{position:absolute;width:4px;height:4px;background:#ffd6e0;animation:twinkle 2s infinite;}
+    @keyframes twinkle{0%,100%{opacity:1}50%{opacity:0.2}}
+
+    .page{position:relative;z-index:1;width:100%;max-width:580px;display:flex;flex-direction:column;align-items:center;gap:18px;}
+
+    .title-badge{
+      background:#ff2d55;color:#fff0f5;font-size:7px;padding:6px 14px;
+      display:inline-block;box-shadow:4px 4px 0 #8b0024;letter-spacing:1px;margin-top:8px;
+    }
+    .main-title{font-size:12px;color:#ffd6e0;text-shadow:3px 3px 0 #8b0024;line-height:1.9;text-align:center;}
+    .sub{font-size:7px;color:#ff8fab;text-align:center;line-height:2;}
+
+    .pixel-border{
+      border:4px solid #ff6b8a;
+      box-shadow:0 0 0 4px #1a0a14,0 0 0 8px #ff6b8a,0 0 0 12px #1a0a14;
+      background:#2d0f22;
+      padding:22px 20px;
+      width:100%;
+      position:relative;
+    }
+    .heart-corner{position:absolute;font-size:14px;color:#ff6b8a;animation:hb 1.4s infinite;}
+    .heart-corner.tl{top:-10px;left:-10px;}
+    .heart-corner.tr{top:-10px;right:-10px;}
+    .heart-corner.bl{bottom:-10px;left:-10px;}
+    .heart-corner.br{bottom:-10px;right:-10px;}
+    @keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+
+    /* HUD */
+    .hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px;}
+    .hud-box{
+      background:#3d1030;border:3px solid #ff6b8a;
+      box-shadow:3px 3px 0 #8b0024;
+      padding:6px 10px;text-align:center;min-width:80px;
+    }
+    .hud-num{font-size:14px;color:#ff2d55;display:block;text-shadow:2px 2px 0 #8b0024;}
+    .hud-lbl{font-size:5px;color:#ff8fab;display:block;margin-top:3px;letter-spacing:0.5px;}
+
+    /* difficulty badge */
+    .diff-badge{
+      font-size:6px;padding:4px 10px;display:inline-block;
+      box-shadow:2px 2px 0 #8b0024;margin-bottom:14px;
+    }
+    .diff-easy{background:#27500a;color:#c0dd97;border:2px solid #639922;}
+    .diff-medium{background:#633806;color:#fac775;border:2px solid #ba7517;}
+    .diff-hard{background:#791f1f;color:#f09595;border:2px solid #e24b4a;}
+
+    /* progress bar */
+    .prog-wrap{margin-bottom:18px;}
+    .prog-lbl{font-size:5px;color:#ff8fab;margin-bottom:5px;}
+    .prog-bg{height:10px;background:#3d1030;border:2px solid #ff6b8a;box-shadow:2px 2px 0 #8b0024;}
+    .prog-fill{height:100%;background:#ff2d55;transition:width 0.5s;}
+
+    /* question */
+    .q-num{font-size:6px;color:#ff8fab;margin-bottom:10px;}
+    .q-text{font-size:9px;color:#ffd6e0;line-height:1.9;margin-bottom:20px;min-height:48px;}
+
+    /* options */
+    .options{display:flex;flex-direction:column;gap:10px;}
+    .opt-btn{
+      background:#3d1030;border:3px solid #ff6b8a;
+      box-shadow:3px 3px 0 #8b0024;
+      color:#ffd6e0;font-family:'Press Start 2P',monospace;font-size:7px;
+      padding:11px 14px;text-align:left;cursor:pointer;
+      transition:transform 0.1s,box-shadow 0.1s;
+      line-height:1.8;
+    }
+    .opt-btn:hover:not(:disabled){transform:translate(-2px,-2px);box-shadow:5px 5px 0 #8b0024;background:#4d1840;}
+    .opt-btn:active:not(:disabled){transform:translate(1px,1px);box-shadow:1px 1px 0 #8b0024;}
+    .opt-btn:disabled{cursor:default;}
+    .opt-btn.correct{background:#0f6e56;border-color:#1d9e75;color:#9fe1cb;box-shadow:3px 3px 0 #04342c;}
+    .opt-btn.wrong{background:#791f1f;border-color:#e24b4a;color:#f09595;box-shadow:3px 3px 0 #501313;}
+    .opt-btn.reveal{background:#0f6e56;border-color:#1d9e75;color:#9fe1cb;box-shadow:3px 3px 0 #04342c;opacity:0.7;}
+
+    /* feedback */
+    .feedback{
+      margin-top:14px;font-size:7px;line-height:2;
+      min-height:28px;text-align:center;
+    }
+    .feedback.correct{color:#5dcaa5;}
+    .feedback.wrong{color:#f09595;}
+
+    /* next btn */
+    .next-btn{
+      display:none;margin-top:16px;width:100%;
+      background:#ff2d55;border:none;color:#fff0f5;
+      font-family:'Press Start 2P',monospace;font-size:8px;
+      padding:12px;cursor:pointer;
+      box-shadow:4px 4px 0 #8b0024;
+      transition:transform 0.1s;
+    }
+    .next-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #8b0024;}
+    .next-btn:active{transform:translate(1px,1px);box-shadow:2px 2px 0 #8b0024;}
+    .next-btn.show{display:block;}
+
+    /* hearts lives */
+    .lives{font-size:16px;letter-spacing:4px;}
+
+    /* RESULTS SCREEN */
+    #resultsScreen{display:none;}
+    .results-inner{text-align:center;}
+    .score-box{
+      background:#3d1030;border:4px solid #ff2d55;
+      box-shadow:6px 6px 0 #8b0024;
+      padding:20px;margin:16px 0;display:inline-block;min-width:160px;
+    }
+    .score-big{font-size:28px;color:#ff2d55;display:block;text-shadow:3px 3px 0 #8b0024;}
+    .score-lbl{font-size:6px;color:#ff8fab;display:block;margin-top:6px;}
+    .result-msg{font-family:'VT323',monospace;font-size:24px;color:#ffd6e0;line-height:1.7;margin:14px 0;}
+    .divider{height:4px;background:repeating-linear-gradient(90deg,#ff2d55 0 8px,transparent 8px 16px);margin:12px 0;}
+    .stars-display{font-size:20px;letter-spacing:6px;margin:10px 0;animation:hb 1.2s infinite;}
+
+    .continue-btn{
+      display:inline-block;margin-top:18px;
+      background:#ff2d55;border:none;color:#fff0f5;
+      font-family:'Press Start 2P',monospace;font-size:8px;
+      padding:12px 20px;cursor:pointer;
+      box-shadow:4px 4px 0 #8b0024;
+      text-decoration:none;
+      transition:transform 0.1s;
+    }
+    .continue-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #8b0024;}
+
+    .pixel-hearts-row{display:flex;justify-content:center;gap:8px;margin:10px 0;}
+    .ph{width:14px;height:14px;background:#ff2d55;position:relative;display:inline-block;transform:rotate(45deg);animation:hb 1.4s infinite;}
+    .ph::before,.ph::after{content:'';width:14px;height:14px;background:#ff2d55;border-radius:50% 50% 0 0;position:absolute;}
+    .ph::before{left:-7px;top:0;}
+    .ph::after{top:-7px;left:0;}
+    .ph:nth-child(even){background:#ff8fab;}
+    .ph:nth-child(even)::before,.ph:nth-child(even)::after{background:#ff8fab;}
+  </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="page">
+  <div class="title-badge">✦ MONTH 3 — Quest unlocked ✦</div>
+  <div class="main-title">HOW WELL DO<br/>YOU KNOW US?</div>
+  
+
+  <div class="pixel-border" id="quizScreen">
+    <span class="heart-corner tl">♥</span>
+    <span class="heart-corner tr">♥</span>
+    <span class="heart-corner bl">♥</span>
+    <span class="heart-corner br">♥</span>
+
+    <div class="hud">
+      <div class="hud-box">
+        <span class="hud-num" id="scoreDisplay">0</span>
+        <span class="hud-lbl">SCORE</span>
+      </div>
+      <div class="hud-box">
+        <span class="hud-num lives" id="livesDisplay">♥♥♥</span>
+        <span class="hud-lbl">LIVES</span>
+      </div>
+      <div class="hud-box">
+        <span class="hud-num" id="qNumDisplay">1/6</span>
+        <span class="hud-lbl">QUESTION</span>
+      </div>
+    </div>
+
+    <div class="prog-wrap">
+      <div class="prog-lbl">PROGRESS</div>
+      <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="diff-badge diff-easy" id="diffBadge">★ EASY</div>
+    <div class="q-num" id="qNum">QUESTION 1 OF 6</div>
+    <div class="q-text" id="qText"></div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">NEXT QUESTION ▶</button>
+  </div>
+
+  <div class="pixel-border" id="resultsScreen">
+    <span class="heart-corner tl">♥</span>
+    <span class="heart-corner tr">♥</span>
+    <span class="heart-corner bl">♥</span>
+    <span class="heart-corner br">♥</span>
+
+    <div class="results-inner">
+      <div class="title-badge" style="margin-bottom:14px;">✦ QUIZ COMPLETE ✦</div>
+      <div class="stars-display" id="starsDisplay">★★★</div>
+      <div class="score-box">
+        <span class="score-big" id="finalScore">0</span>
+        <span class="score-lbl">FINAL SCORE</span>
+      </div>
+      <div class="divider"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="pixel-hearts-row">
+        <div class="ph"></div><div class="ph"></div><div class="ph"></div>
+        <div class="ph"></div><div class="ph"></div>
+      </div>
+      <div class="divider"></div>
+      <a href="month4.html" class="continue-btn">▶ CONTINUE TO MONTH 4</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    diff: 'easy',
+    diffLabel: '★ EASY',
+    diffClass: 'diff-easy',
+    text: 'Who said "I love you" first?',
+    options: ['Sophia', 'Claris', 'We both said it at the same time', 'Neither yet!'],
+    answer: 'Claris',
+    correct: '♥ It was Claris, but only because Sophia was taking too long',
+    wrong: 'Not quite! Claris said it first. ♥'
+  },
+  {
+    diff: 'easy',
+    diffLabel: '★ EASY',
+    diffClass: 'diff-easy',
+    text: 'What was the very first thing we talked about on Instagram?',
+    options: ['Our favourite foods', 'Our favourite movies', 'Music we like', 'Where we grew up'],
+    answer: 'Our favourite movies',
+    correct: 'Yep. You said my Instagram WAS cooler than my tiktok. ♥',
+    wrong: 'Nope. You asked what my favorite movie was ♥'
+  },
+  {
+    diff: 'medium',
+    diffLabel: '★★ MEDIUM',
+    diffClass: 'diff-medium',
+    text: "What did you say your favourite movie was?",
+    options: ['Ratatouille', 'Call me by your name', 'The Grand Budapest Hotel', 'You did not, you said you have just been watching a lot of Abbot Elementary lately'],
+    answer: 'The Grand Budapest Hotel',
+    correct: 'Yeppp. You said "i love Wes Anderson". ♥',
+    wrong: 'Nope. You said the grand budapest hotel ♥'
+  },
+  {
+    diff: 'medium',
+    diffLabel: '★★ MEDIUM',
+    diffClass: 'diff-medium',
+    text: 'On what day and time did Sophia ask you out?',
+    options: ['July 28th, Friday at 5pm', 'August 2nd, Saturday at 7pm', 'August 10th, Sunday at 8pm', 'July 31st, Saturday at 6pm'],
+    answer: 'August 2nd, Saturday at 7pm',
+    correct: 'August 2nd at 7pm — teehee how did you even remember that ♥',
+    wrong: 'August 2nd, Saturday at 7pm. ♥'
+  },
+  {
+    diff: 'hard',
+    diffLabel: '★★★ HARD',
+    diffClass: 'diff-hard',
+    text: 'Which artist did Sophia run to find at the Met Museum?',
+    options: ['John Singer Sargent', 'Vincent van Gogh', 'Edgar Degas', 'Henri Matisse'],
+    answer: 'Edgar Degas',
+    correct: 'Edgar Degas! The French impressionist debuted his figure of teenage ballerina Marie van Goethem in 1881. Critics were shocked by the three-foot sculpture. They called it ugly and repulsive. Degas had never publicly exhibited a sculpture before. And he never would again. Until 1920 when the public could better appreciate Degas’s modern subject and realism. ♥',
+    wrong: 'It was Edgar Degas and the Ballerina. ♥'
+  },
+  {
+    diff: 'hard',
+    diffLabel: '★★★ HARD',
+    diffClass: 'diff-hard',
+    text: 'How long did we spend in Central Park on their first date?',
+    options: ['About 1 hour', 'About 2 hours', 'About 3 hours', 'Almost 4 hours'],
+    answer: 'Almost 4 hours',
+    correct: 'Almost 4 whole hours, what the freak ♥',
+    wrong: 'Almost 4 hours!  ♥'
+  }
+];
+
+let current = 0, score = 0, lives = 3, answered = false;
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('diffBadge').className = 'diff-badge ' + q.diffClass;
+  document.getElementById('diffBadge').textContent = q.diffLabel;
+  document.getElementById('qNum').textContent = 'QUESTION ' + (current + 1) + ' OF ' + questions.length;
+  document.getElementById('qNumDisplay').textContent = (current + 1) + '/' + questions.length;
+  document.getElementById('qText').textContent = q.text;
+  document.getElementById('progFill').style.width = (current / questions.length * 100) + '%';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('nextBtn').className = 'next-btn';
+  answered = false;
+
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(opt, btn);
+    opts.appendChild(btn);
+  });
+}
+
+function selectAnswer(chosen, btn) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const allBtns = document.querySelectorAll('.opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  if (chosen === q.answer) {
+    btn.classList.add('correct');
+    const pts = current < 2 ? 100 : current < 4 ? 200 : 300;
+    score += pts;
+    document.getElementById('scoreDisplay').textContent = score;
+    document.getElementById('feedback').textContent = '✓ ' + q.correct;
+    document.getElementById('feedback').className = 'feedback correct';
+  } else {
+    btn.classList.add('wrong');
+    allBtns.forEach(b => { if (b.textContent === q.answer) b.classList.add('reveal'); });
+    lives = Math.max(0, lives - 1);
+    updateLives();
+    document.getElementById('feedback').textContent = '✗ ' + q.wrong;
+    document.getElementById('feedback').className = 'feedback wrong';
+  }
+
+  document.getElementById('nextBtn').className = 'next-btn show';
+  if (current === questions.length - 1) {
+    document.getElementById('nextBtn').textContent = 'SEE MY SCORE ★';
+  }
+}
+
+function updateLives() {
+  const h = '♥'.repeat(lives) + '♡'.repeat(3 - lives);
+  document.getElementById('livesDisplay').textContent = h;
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quizScreen').style.display = 'none';
+  document.getElementById('resultsScreen').style.display = 'block';
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('progFill').style.width = '100%';
+
+  const maxScore = 100 + 100 + 200 + 200 + 300 + 300;
+  const pct = score / maxScore;
+  let stars, msg;
+
+  if (pct === 1) {
+    stars = '★★★★★';
+    msg = 'PERFECT SCORE! You know us inside and out bear.  ♥';
+  } else if (pct >= 0.75) {
+    stars = '★★★★☆';
+    msg = 'Amazing! You remember so much stinky! ♥';
+  } else if (pct >= 0.5) {
+    stars = '★★★☆☆';
+    msg = 'Not bad not bad. Sorry these questions were hard hehe ♥';
+  } else {
+    stars = '★★☆☆☆';
+    msg = 'GAH! LOCK IN. ♥';
+  }
+
+  document.getElementById('starsDisplay').textContent = stars;
+  document.getElementById('resultMsg').textContent = msg;
+}
+
+renderQuestion();
+
+const sc = document.getElementById('stars');
+for (let i = 0; i < 50; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = Math.random() * 100 + '%';
+  s.style.top = Math.random() * 100 + '%';
+  s.style.animationDelay = (Math.random() * 2) + 's';
+  s.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+  sc.appendChild(s);
+}
+</script>
+</body>
+</html>

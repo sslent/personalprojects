@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Month 4 — Play a Game Together ♥</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;image-rendering:pixelated;}
+
+    body{
+      background:#1a0a14;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      padding:24px 16px 48px;
+      font-family:'Press Start 2P',monospace;
+      overflow-x:hidden;
+    }
+
+    .stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+    .star{position:absolute;width:4px;height:4px;background:#ffd6e0;animation:twinkle 2s infinite;}
+    @keyframes twinkle{0%,100%{opacity:1}50%{opacity:0.2}}
+
+    .page{
+      position:relative;
+      z-index:1;
+      width:100%;
+      max-width:700px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:18px;
+    }
+
+    .title-badge{
+      background:#ff2d55;
+      color:#fff0f5;
+      font-size:7px;
+      padding:6px 14px;
+      display:inline-block;
+      box-shadow:4px 4px 0 #8b0024;
+      letter-spacing:1px;
+      margin-top:8px;
+    }
+
+    .main-title{
+      font-size:12px;
+      color:#ffd6e0;
+      text-shadow:3px 3px 0 #8b0024;
+      line-height:1.9;
+      text-align:center;
+    }
+
+    .sub-title{
+      font-family:'VT323',monospace;
+      font-size:22px;
+      color:#ff8fab;
+      text-align:center;
+      line-height:1.5;
+    }
+
+    .pixel-border{
+      border:4px solid #ff6b8a;
+      box-shadow:0 0 0 4px #1a0a14,0 0 0 8px #ff6b8a,0 0 0 12px #1a0a14;
+      background:#2d0f22;
+      padding:22px 20px;
+      width:100%;
+      position:relative;
+    }
+
+    .heart-corner{position:absolute;font-size:14px;color:#ff6b8a;animation:hb 1.4s infinite;}
+    .heart-corner.tl{top:-10px;left:-10px;}
+    .heart-corner.tr{top:-10px;right:-10px;}
+    .heart-corner.bl{bottom:-10px;left:-10px;}
+    .heart-corner.br{bottom:-10px;right:-10px;}
+    @keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+
+    /* Intro box */
+    .intro-box{
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:14px;
+    }
+
+    .intro-text{
+      font-family:'VT323',monospace;
+      font-size:22px;
+      color:#ffd6e0;
+      line-height:1.7;
+    }
+
+    .divider{
+      height:4px;
+      width:100%;
+      background:repeating-linear-gradient(90deg,#ff2d55 0 8px,transparent 8px 16px);
+      margin:4px 0;
+    }
+
+    /* Instructions */
+    .instructions{
+      background:#3d1030;
+      border:3px solid #ff6b8a;
+      box-shadow:3px 3px 0 #8b0024;
+      padding:14px 16px;
+      width:100%;
+    }
+
+    .instr-title{
+      font-size:7px;
+      color:#ff2d55;
+      text-shadow:2px 2px 0 #8b0024;
+      margin-bottom:12px;
+      display:block;
+    }
+
+    .instr-list{
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .instr-list li{
+      font-family:'VT323',monospace;
+      font-size:20px;
+      color:#ffd6e0;
+      padding-left:22px;
+      position:relative;
+      line-height:1.4;
+    }
+
+    .instr-list li::before{
+      content:'♥';
+      position:absolute;
+      left:0;
+      color:#ff2d55;
+      font-size:18px;
+    }
+
+    /* Game container */
+    .game-container{
+      width:100%;
+      position:relative;
+    }
+
+    .game-label{
+      font-size:6px;
+      color:#ff8fab;
+      margin-bottom:10px;
+      display:block;
+      text-align:center;
+      letter-spacing:1px;
+    }
+
+    .iframe-wrap{
+      position:relative;
+      width:100%;
+      /* 16:9-ish ratio for the arcade */
+      padding-bottom:62%;
+      border:4px solid #ff6b8a;
+      box-shadow:0 0 0 4px #1a0a14,0 0 0 8px #ff2d55,4px 4px 0 12px #8b0024;
+      background:#000;
+      overflow:hidden;
+    }
+
+    .iframe-wrap iframe{
+      position:absolute;
+      top:0;left:0;
+      width:100%;
+      height:100%;
+      border:none;
+    }
+
+    /* Loading overlay */
+    .loading-overlay{
+      position:absolute;
+      inset:0;
+      background:#1a0a14;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+      z-index:5;
+      transition:opacity 0.5s;
+    }
+
+    .loading-overlay.hidden{
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .loading-text{
+      font-size:8px;
+      color:#ffd6e0;
+      text-shadow:2px 2px 0 #8b0024;
+      animation:blink 1s infinite;
+    }
+
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+    .loading-hearts{
+      font-size:22px;
+      letter-spacing:8px;
+      color:#ff2d55;
+      animation:hb 0.8s infinite;
+    }
+
+    /* Status bar below game */
+    .status-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:12px;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .status-chip{
+      background:#3d1030;
+      border:3px solid #ff6b8a;
+      box-shadow:3px 3px 0 #8b0024;
+      padding:6px 10px;
+      font-size:5px;
+      color:#ff8fab;
+      letter-spacing:0.5px;
+    }
+
+    .status-chip span{
+      display:block;
+      font-size:10px;
+      color:#ffd6e0;
+      margin-top:3px;
+      text-align:center;
+    }
+
+    /* Fullscreen button */
+    .fs-btn{
+      background:#ff2d55;
+      border:none;
+      color:#fff0f5;
+      font-family:'Press Start 2P',monospace;
+      font-size:6px;
+      padding:8px 12px;
+      cursor:pointer;
+      box-shadow:3px 3px 0 #8b0024;
+      transition:transform 0.1s,box-shadow 0.1s;
+    }
+    .fs-btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #8b0024;}
+    .fs-btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 #8b0024;}
+
+    /* Bottom message */
+    .bottom-msg{
+      font-family:'VT323',monospace;
+      font-size:20px;
+      color:#ff8fab;
+      text-align:center;
+      line-height:1.7;
+      padding:0 8px;
+    }
+
+    .pixel-hearts-row{display:flex;justify-content:center;gap:8px;margin:4px 0;}
+    .ph{width:14px;height:14px;background:#ff2d55;position:relative;display:inline-block;transform:rotate(45deg);animation:hb 1.4s infinite;}
+    .ph::before,.ph::after{content:'';width:14px;height:14px;background:#ff2d55;border-radius:50% 50% 0 0;position:absolute;}
+    .ph::before{left:-7px;top:0;}
+    .ph::after{top:-7px;left:0;}
+    .ph:nth-child(even){background:#ff8fab;}
+    .ph:nth-child(even)::before,.ph:nth-child(even)::after{background:#ff8fab;}
+
+    /* Continue button */
+    .continue-btn{
+      display:inline-block;
+      margin-top:8px;
+      background:#ff2d55;
+      border:none;
+      color:#fff0f5;
+      font-family:'Press Start 2P',monospace;
+      font-size:8px;
+      padding:12px 20px;
+      cursor:pointer;
+      box-shadow:4px 4px 0 #8b0024;
+      text-decoration:none;
+      transition:transform 0.1s;
+    }
+    .continue-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #8b0024;}
+    .continue-btn:active{transform:translate(1px,1px);box-shadow:2px 2px 0 #8b0024;}
+
+    /* Responsive */
+    @media(max-width:480px){
+      .main-title{font-size:9px;}
+      .iframe-wrap{padding-bottom:75%;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="title-badge">&#10022; MONTH 4 quest unlocked  &#10022;</div>
+  <div class="main-title">A LITTLE GAME<br/>FOR YOU &#9829;</div>
+
+  <!-- Intro card -->
+  <div class="pixel-border">
+    <span class="heart-corner tl">&#9829;</span>
+    <span class="heart-corner tr">&#9829;</span>
+    <span class="heart-corner bl">&#9829;</span>
+    <span class="heart-corner br">&#9829;</span>
+
+    <div class="intro-box">
+      <div class="intro-text">
+        Okay so I made you something.<br/>
+        I hand coded it and even made all the characters.<br/>
+        Make it to the end for a surprise...have fun! &#9829;
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="instructions">
+        <span class="instr-title">&#9658; HOW TO PLAY</span>
+        <ul class="instr-list">
+          <li>Use the arrow keys or on-screen buttons to move</li>
+          <li>Dont fall into the lava!</li>
+         
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game card -->
+  <div class="pixel-border game-container">
+    <span class="heart-corner tl">&#9829;</span>
+    <span class="heart-corner tr">&#9829;</span>
+    <span class="heart-corner bl">&#9829;</span>
+    <span class="heart-corner br">&#9829;</span>
+
+    <span class="game-label">&#9733; PRESS START &#9733;</span>
+
+    <div class="iframe-wrap" id="iframeWrap">
+      <!-- Loading overlay -->
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-hearts">&#9829;&#9829;&#9829;</div>
+        <div class="loading-text">LOADING GAME...</div>
+      </div>
+
+      <iframe
+        id="gameFrame"
+        src="https://arcade.makecode.com/50228-32370-46978-14310"
+        title="A game Sophia made for Claris ♥"
+        allowfullscreen
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+        loading="lazy"
+        onload="gameLoaded()"
+      ></iframe>
+    </div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <div class="status-chip">
+        MADE BY
+        <span>SOPHIA &#9829;</span>
+      </div>
+      <button class="fs-btn" onclick="goFullscreen()">&#9654; FULLSCREEN</button>
+      <div class="status-chip">
+        FOR
+        <span>CLARIS &#9829;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom message card -->
+  <div class="pixel-border">
+    <span class="heart-corner tl">&#9829;</span>
+    <span class="heart-corner tr">&#9829;</span>
+    <span class="heart-corner bl">&#9829;</span>
+    <span class="heart-corner br">&#9829;</span>
+
+    <div class="intro-box">
+      <div class="divider"></div>
+      <div class="bottom-msg">
+        wow this is fun isnt it. <br/>
+        okay lets see whats next hmmmm &#9829;
+      </div>
+      <div class="pixel-hearts-row">
+        <div class="ph"></div>
+        <div class="ph"></div>
+        <div class="ph"></div>
+        <div class="ph"></div>
+        <div class="ph"></div>
+      </div>
+      <div class="divider"></div>
+      <a href="month5.html" class="continue-btn">&#9658; CONTINUE TO MONTH 5</a>
+    </div>
+  </div>
+
+</div><!-- end .page -->
+
+<script>
+  /* Twinkling stars */
+  var sc = document.getElementById("stars");
+  for (var i = 0; i < 50; i++) {
+    var s = document.createElement("div");
+    s.className = "star";
+    s.style.left = Math.random() * 100 + "%";
+    s.style.top  = Math.random() * 100 + "%";
+    s.style.animationDelay    = (Math.random() * 2) + "s";
+    s.style.animationDuration = (1.5 + Math.random() * 2) + "s";
+    sc.appendChild(s);
+  }
+
+  /* Hide loading overlay once iframe fires onload */
+  function gameLoaded() {
+    var overlay = document.getElementById("loadingOverlay");
+    overlay.classList.add("hidden");
+  }
+
+  /* Fallback: hide overlay after 8 s in case onload never fires */
+  setTimeout(function() {
+    var overlay = document.getElementById("loadingOverlay");
+    if (overlay) overlay.classList.add("hidden");
+  }, 8000);
+
+  /* Fullscreen the iframe wrapper */
+  function goFullscreen() {
+    var el = document.getElementById("gameFrame");
+    if (el.requestFullscreen)            { el.requestFullscreen(); }
+    else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+    else if (el.mozRequestFullScreen)    { el.mozRequestFullScreen(); }
+    else if (el.msRequestFullscreen)     { el.msRequestFullscreen(); }
+  }
+</script>
+
+</body>
+</html>
